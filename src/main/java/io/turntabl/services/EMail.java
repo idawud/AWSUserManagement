@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class EMail {
-
     public static void requestMessage(String userName, String userEmail , Set<String> roles,String explanation, String requestId) throws IOException, GeneralSecurityException {
         if ( roles.size() == 0){ return;}
 
