@@ -31,7 +31,7 @@ public class RolesController {
             long insertId = permissionStorage.insert(rolesRequest.getEmail(), rolesRequest.getAwsArns());
             String username = GSuite.fetchEmailToUserName().getOrDefault(rolesRequest.getEmail(), "");
             if (!username.isEmpty()){
-                EMail.requestMessage(username, rolesRequest.getEmail(), rolesRequest.getAwsArns(), String.valueOf(insertId));
+                EMail.requestMessage(username, rolesRequest.getEmail(), rolesRequest.getAwsArns(), rolesRequest.getExplanation(), String.valueOf(insertId));
             }
             return new PermissionStatus(true);
         }catch (Exception e){
