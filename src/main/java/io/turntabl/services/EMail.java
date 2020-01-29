@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class EMail {
 
-    public static void requestMessage(String userName, String userEmail , Set<String> roles, String requestId) throws IOException, GeneralSecurityException {
+    public static void requestMessage(String userName, String userEmail , Set<String> roles,String explanation, String requestId) throws IOException, GeneralSecurityException {
         if ( roles.size() == 0){ return;}
 
         String subject = "Request for AWS Role Permission";
@@ -21,10 +21,16 @@ public class EMail {
                 return inter[inter.length - 1];
             }).collect(Collectors.toSet()).forEach( role -> body.append("<li>").append(role).append("</li>"));
             body.append("</ul> <br>" );
+
         }
         else {
             String[] inter = roles.stream().findFirst().get().split("/");
-            body.append(" is seeking permission for ").append(inter[inter.length - 1]).append("  AWS role. </p>");
+            body.append(" is seeking permission for ").append(inter[inter.length - 1]).append("  AWS role. </p> <br>");
+        }
+
+        if ( !explanation.isEmpty()){
+            body.append("<h4> Explanation: </h4>" );
+            body.append(" <p style=\"font-size: 14px;\">").append(explanation).append("</p>");
         }
 
         body.append("<a href=\"https://permission.services.turntabl.io/v1/api/aws-mgnt/approve/")
