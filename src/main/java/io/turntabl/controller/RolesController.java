@@ -10,7 +10,6 @@ import io.turntabl.services.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -73,6 +72,12 @@ public class RolesController {
             e.printStackTrace();
             return new PermissionStatus(false);
         }
+    }
+
+    @ApiOperation("get all pending requests waiting for approval")
+    @GetMapping(value = "/v1/api/aws-mgnt/pending", produces = "application/json")
+    public List<PendingRequest> getAllPendingRequests(){
+        return permissionStorage.pendingRequests();
     }
 
     @ApiOperation("get all roles on the aws account")

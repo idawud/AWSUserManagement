@@ -1,7 +1,7 @@
 package io.turntabl.services;
 
 
-import io.turntabl.models.PendingPermission;
+import io.turntabl.models.PendingRequest;
 import io.turntabl.models.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -55,13 +55,13 @@ public class PermissionStorage {
                 BeanPropertyRowMapper.newInstance(Request.class));
     }
 
-    public List<PendingPermission> pendingRequests(){
-        List<Request> query = jdbcTemplate.query("SELECT * FROM requests WHERE status = 'PENDING'",
-                BeanPropertyRowMapper.newInstance(Request.class));
-        return query.stream()
+    public List<PendingRequest> pendingRequests(){
+         return jdbcTemplate.query("SELECT * FROM requests WHERE status = 'PENDING'",
+                BeanPropertyRowMapper.newInstance(Request.class))
+                 .stream()
                     .map(q -> {
                         Set<String> awsArns = new HashSet<>(Arrays.asList(q.getARN().split(" -,,- ")));
-                        return new PendingPermission(q.getUserEmail(), q.getStatus(), awsArns);
+                        return new PendingRequest(q.getUserEmail(), q.getStatus(), awsArns);
                     })
                     .collect(Collectors.toList());
     }

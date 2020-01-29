@@ -2,15 +2,15 @@ package io.turntabl.models;
 
 import java.util.Set;
 
-public class PendingPermission {
+public class PendingRequest {
     private String userEmail;
     private String status;
     private Set<String> awsArns;
 
-    public PendingPermission(String userEmail, String status, Set<String> awsArns) {
+    public PendingRequest(String userEmail, String status, Set<String> awsArns) {
     }
 
-    public PendingPermission() {
+    public PendingRequest() {
     }
 
     public String getUserEmail() {
