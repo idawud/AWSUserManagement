@@ -14,7 +14,7 @@ public class PendingRequest {
         this.status = status;
         this.identifier = identifier;
         this.awsArns = awsArns;
-        this.request_time = request_time;
+        this.setRequest_time(request_time);
     }
 
     public PendingRequest() {
@@ -57,6 +57,10 @@ public class PendingRequest {
     }
 
     public void setRequest_time(String request_time) {
-        this.request_time = request_time;
+        if ( request_time.contains(".")) {
+            this.request_time = request_time.substring(0, request_time.lastIndexOf("."));
+        }else {
+            this.request_time = request_time;
+        }
     }
 }
