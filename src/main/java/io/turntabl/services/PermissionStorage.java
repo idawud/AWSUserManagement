@@ -61,7 +61,7 @@ public class PermissionStorage {
                  .stream()
                     .map(q -> {
                         Set<String> awsArns = new HashSet<>(Arrays.asList(q.getARN().split(" -,,- ")));
-                        return new PendingRequest(q.getUserEmail(), q.getStatus(), awsArns);
+                        return new PendingRequest( q.getUserEmail(), q.getStatus(), q.getIdentifier(), awsArns);
                     })
                     .collect(Collectors.toList());
     }
