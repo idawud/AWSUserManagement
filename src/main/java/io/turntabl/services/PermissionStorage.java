@@ -60,7 +60,12 @@ public class PermissionStorage {
                 BeanPropertyRowMapper.newInstance(Request.class))
                  .stream()
                     .map(q -> {
-                        Set<String> awsArns = new HashSet<>(Arrays.asList(q.getARN().split(" -,,- ")));
+                        Set<String> awsArns = Arrays.stream(q.getARN().split(" -,,- "))
+                                .map(s -> {
+                                    String[] inter = s.split("/");
+                                    return inter[inter.length - 1];
+                                })
+                                .collect(Collectors.toSet());
                         return new PendingRequest( q.getUserEmail(), q.getStatus(), q.getIdentifier(), awsArns);
                     })
                     .collect(Collectors.toList());
