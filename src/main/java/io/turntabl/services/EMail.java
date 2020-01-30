@@ -7,10 +7,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class EMail {
-    public static void requestMessage(String userName, String userEmail , Set<String> roles,String explanation, String requestId) throws IOException, GeneralSecurityException {
+    public static void requestMessage(String requestIdentifier, String userName, String userEmail , Set<String> roles,String explanation, String requestId) throws IOException, GeneralSecurityException {
         if ( roles.size() == 0){ return;}
 
-        String subject = "Request for AWS Role Permission";
+        String subject = "[" + requestIdentifier + "] Request for AWS Role Permission";
         StringBuilder body = new StringBuilder( " <p style=\"font-size: 14px;\">" + userName + " ( " + userEmail  + " ) <br>");
         if ( roles.size() > 1){
             body.append(" is seeking permission to the following AWS roles: </p>");
@@ -40,10 +40,10 @@ public class EMail {
     }
 
 
-    public static void feedbackMessage(String userEmail, Boolean granted) throws IOException, GeneralSecurityException {
+    public static void feedbackMessage(String userEmail, String requestIdentifier, Boolean granted) throws IOException, GeneralSecurityException {
         String subject, body;
         if (granted) {
-            subject = "AWS Role Permission Request Granted";
+            subject = "[" + requestIdentifier + "] AWS Role Permission Request Granted";
             body = " <p style=\"font-size: 16px;\"> This permissions will last for only "+ System.getenv("PERMISSION_DURATION_IN_MINUTES") + "min. </p>" ;
         }else {
             subject = "AWS Role Permission Request Declined";

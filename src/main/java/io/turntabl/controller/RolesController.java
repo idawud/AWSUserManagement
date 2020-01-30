@@ -34,7 +34,7 @@ public class RolesController {
             }
             String username = GSuite.fetchEmailToUserName().getOrDefault(rolesRequest.getEmail(), "");
             if (!username.isEmpty()){
-                EMail.requestMessage(username, rolesRequest.getEmail(), rolesRequest.getAwsArns(), rolesRequest.getExplanation(), String.valueOf(insertId));
+                EMail.requestMessage( rolesRequest.getIdentifier(), username, rolesRequest.getEmail(), rolesRequest.getAwsArns(), rolesRequest.getExplanation(), String.valueOf(insertId));
                 return new PermissionStatus(true, "request submitted, pending approval");
             }
             return new PermissionStatus(false, "Invalid User");
@@ -52,16 +52,17 @@ public class RolesController {
             if ( requestDetails  == null){
                 return new PermissionStatus(false, "permission Granted or Declined Already");
             }
+
             permissionStorage.approvedRequest( requestId );
 
             String userEmail = requestDetails.getUserEmail();
             List<String> strings = Arrays.asList(requestDetails.getARN().split(" -,,- "));
             Set<String> awsArns = new HashSet<>(strings);
+
            GSuite.grantMultipleAWSARN(userEmail, awsArns);
+           EMail.feedbackMessage(userEmail, requestDetails.getIdentifier(), true);
 
-           EMail.feedbackMessage(userEmail, true);
-
-            return new PermissionStatus(true, "permission granted");
+            return new PermissionStatus(true);
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();
             return new PermissionStatus(false,"error sending mail");
@@ -78,11 +79,11 @@ public class RolesController {
             }
 
             String email = permissionStorage.removeRequest(requestId);
-            EMail.feedbackMessage(email, false);
+            EMail.feedbackMessage(email, requestDetails.getIdentifier(),false);
             return new PermissionStatus(true);
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();
-            return new PermissionStatus(false);
+            return new PermissionStatus(false,"error sending email");
         }
     }
 
