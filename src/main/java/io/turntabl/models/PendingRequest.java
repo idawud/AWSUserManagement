@@ -6,13 +6,15 @@ public class PendingRequest {
     private String userEmail;
     private String status;
     private String identifier;
+    private String request_time;
     private Set<String> awsArns;
 
-    public PendingRequest(String userEmail, String status, String identifier, Set<String> awsArns) {
+    public PendingRequest(String userEmail, String status, String identifier, String request_time, Set<String> awsArns) {
         this.userEmail = userEmail;
         this.status = status;
         this.identifier = identifier;
         this.awsArns = awsArns;
+        this.request_time = request_time;
     }
 
     public PendingRequest() {
@@ -48,5 +50,13 @@ public class PendingRequest {
 
     public void setAwsArns(Set<String> awsArns) {
         this.awsArns = awsArns;
+    }
+
+    public String getRequest_time() {
+        return request_time;
+    }
+
+    public void setRequest_time(String request_time) {
+        this.request_time = request_time;
     }
 }

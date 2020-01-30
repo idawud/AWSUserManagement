@@ -70,7 +70,7 @@ public class PermissionStorage {
                                     return inter[inter.length - 1];
                                 })
                                 .collect(Collectors.toSet());
-                        return new PendingRequest( q.getUserEmail(), q.getStatus(), q.getIdentifier(), awsArns);
+                        return new PendingRequest( q.getUserEmail(), q.getStatus(), q.getIdentifier(), q.getRequest_time(), awsArns);
                     })
                  .collect(Collectors.toList());
     }
