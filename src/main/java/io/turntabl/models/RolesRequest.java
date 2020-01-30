@@ -5,6 +5,7 @@ import java.util.Set;
 public class RolesRequest {
     private String email;
     private String explanation;
+    private String request_id;
     private Set<String> awsArns;
 
     public RolesRequest() { }
@@ -31,5 +32,13 @@ public class RolesRequest {
 
     public void setExplanation(String explanation) {
         this.explanation = explanation;
+    }
+
+    public String getRequest_id() {
+        return request_id;
+    }
+
+    public void setRequest_id(String request_id) {
+        this.request_id = request_id;
     }
 }

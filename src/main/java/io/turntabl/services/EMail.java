@@ -36,7 +36,7 @@ public class EMail {
                 .append(requestId).append("\" target=\"_self\" class=\"button\" style=\"background-color: #4CAF50;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 14px;border-radius: 12px\">Approve</a>       \n").append(" \n")
                 .append(" <a href=\"https://permission.services.turntabl.io/v1/api/aws-mgnt/decline/").append(requestId).append("\" target=\"_blank\" class=\"button button3\" style=\"background-color: #f44336;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 14px;border-radius: 12px\">Decline</a> ");
 
-        GmailService.sendMail(System.getenv("GSUITE_ADMIN_EMAIL"), subject, body.toString());
+        GmailService.sendMail(userEmail, System.getenv("GSUITE_ADMIN_EMAIL"), subject, body.toString());
     }
 
 
@@ -44,13 +44,13 @@ public class EMail {
         String subject, body;
         if (granted) {
             subject = "AWS Role Permission Request Granted";
-            body = " <p style=\"font-size: 16px;\"> This permissions will last for only 10min. </p>" ;
+            body = " <p style=\"font-size: 16px;\"> This permissions will last for only "+ System.getenv("PERMISSION_DURATION_IN_MINUTES") + "min. </p>" ;
         }else {
             subject = "AWS Role Permission Request Declined";
             body = " <p style=\"font-size: 16px;\"> Sorry, your request has being declined, contact the administrator sam@turntabl.io</p>";
         }
 
-        GmailService.sendMail(userEmail, subject, body);
+        GmailService.sendMail(System.getenv("GSUITE_ADMIN_EMAIL"), userEmail, subject, body);
     }
 
 }
