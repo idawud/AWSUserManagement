@@ -28,7 +28,7 @@ public class RolesController {
     @PostMapping(value = "/v1/api/aws-mgnt/send", consumes = "application/json", produces = "application/json")
     public PermissionStatus sendPermission(@RequestBody RolesRequest rolesRequest){
         try {
-            long insertId = permissionStorage.insert(rolesRequest.getEmail(), rolesRequest.getAwsArns());
+            long insertId = permissionStorage.insert(rolesRequest.getIdentifier(), rolesRequest.getEmail() ,rolesRequest.getAwsArns());
             if ( insertId == -1){
                 return new PermissionStatus(false, "Operation halted, Submitting an empty request");
             }

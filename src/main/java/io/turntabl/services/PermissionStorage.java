@@ -18,7 +18,7 @@ public class PermissionStorage {
 
     public PermissionStorage(){ }
 
-    public long insert(String userEmail, Set<String> arnsRequest){
+    public long insert(String identifier, String userEmail, Set<String> arnsRequest){
         if ( arnsRequest.size() > 0) {
             String arnsString = String.join(" -,,- ", arnsRequest);
 
@@ -27,6 +27,7 @@ public class PermissionStorage {
             insertValue.put("status", "PENDING");
             insertValue.put("useremail", userEmail);
             insertValue.put("arn", arnsString);
+            insertValue.put("identifier", identifier);
 
             Number number = insert.executeAndReturnKey(insertValue);
             return number.longValue();
