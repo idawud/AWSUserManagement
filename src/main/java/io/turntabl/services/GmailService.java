@@ -31,12 +31,12 @@ public class GmailService {
     private static final String CREDENTIALS_FILE_PATH = "credentials/google.json";
 
 
-    public static void sendMail(String to, String subject, String bodyText) throws IOException, GeneralSecurityException {
+    public static void sendMail(String from, String to, String subject, String bodyText) throws IOException, GeneralSecurityException {
         Gmail service = getGmail();
         String user = "me";
         try {
             service.users().messages().send(user,
-                    createMessageWithEmail(createEmail(to, user, subject, bodyText))
+                    createMessageWithEmail(createEmail(to, from, subject, bodyText))
             ).execute();
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -59,7 +59,6 @@ public class GmailService {
                 .setServiceAccountScopes(gcFromJson.getServiceAccountScopes())
                 .setTokenServerEncodedUrl(gcFromJson.getTokenServerEncodedUrl())
                 .build();
-        ;
 
         return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
