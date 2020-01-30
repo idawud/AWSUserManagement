@@ -19,16 +19,19 @@ public class PermissionStorage {
     public PermissionStorage(){ }
 
     public long insert(String userEmail, Set<String> arnsRequest){
-        String arnsString = String.join(" -,,- ", arnsRequest);
+        if ( arnsRequest.size() > 0) {
+            String arnsString = String.join(" -,,- ", arnsRequest);
 
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate).withTableName("requests").usingGeneratedKeyColumns("id");
-        Map<String, Object> insertValue = new HashMap<>();
-        insertValue.put("status", "PENDING");
-        insertValue.put("useremail", userEmail);
-        insertValue.put("arn", arnsString);
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate).withTableName("requests").usingGeneratedKeyColumns("id");
+            Map<String, Object> insertValue = new HashMap<>();
+            insertValue.put("status", "PENDING");
+            insertValue.put("useremail", userEmail);
+            insertValue.put("arn", arnsString);
 
-        Number number = insert.executeAndReturnKey(insertValue);
-        return number.longValue();
+            Number number = insert.executeAndReturnKey(insertValue);
+            return number.longValue();
+        }
+        return -1;
     }
 
 
@@ -46,7 +49,7 @@ public class PermissionStorage {
     }
 
     public Request getRequestDetails( long requestId) {
-        return jdbcTemplate.queryForObject("SELECT * FROM requests WHERE id = ?", new Object[]{requestId},
+        return jdbcTemplate.queryForObject("SELECT * FROM requests WHERE id = ? AND status = 'PENDING'", new Object[]{requestId},
                 BeanPropertyRowMapper.newInstance(Request.class));
     }
 
@@ -68,7 +71,7 @@ public class PermissionStorage {
                                 .collect(Collectors.toSet());
                         return new PendingRequest( q.getUserEmail(), q.getStatus(), q.getIdentifier(), awsArns);
                     })
-                    .collect(Collectors.toList());
+                 .collect(Collectors.toList());
     }
 }
 

@@ -45,6 +45,9 @@ public class RolesController {
     public PermissionStatus approve(  @PathVariable("requestId") long requestId ){
         try {
             Request requestDetails = permissionStorage.getRequestDetails(requestId);
+            if ( requestDetails  == null){
+                return new PermissionStatus(false, "permission Granted or Declined Already");
+            }
             permissionStorage.approvedRequest( requestId );
 
             String userEmail = requestDetails.getUserEmail();
@@ -54,10 +57,10 @@ public class RolesController {
 
            EMail.feedbackMessage(userEmail, true);
 
-            return new PermissionStatus(true);
+            return new PermissionStatus(true, "permission granted");
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();
-            return new PermissionStatus(false);
+            return new PermissionStatus(false,"error sending mail");
         }
     }
 
@@ -65,6 +68,11 @@ public class RolesController {
     @GetMapping(value = "/v1/api/aws-mgnt/decline/{requestId}", produces = "application/json")
     public PermissionStatus decline(  @PathVariable("requestId") long requestId ){
         try {
+            Request requestDetails = permissionStorage.getRequestDetails(requestId);
+            if ( requestDetails  == null){
+                return new PermissionStatus(false, "permission Granted or Declined Already");
+            }
+
             String email = permissionStorage.removeRequest(requestId);
             EMail.feedbackMessage(email, false);
             return new PermissionStatus(true);
