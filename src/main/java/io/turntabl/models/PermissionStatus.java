@@ -2,6 +2,7 @@ package io.turntabl.models;
 
 public class PermissionStatus {
     private String status;
+    private String Message;
 
     public PermissionStatus() { }
 
@@ -11,6 +12,23 @@ public class PermissionStatus {
         }else {
             this.status = "Not Successful";
         }
+    }
+
+    public PermissionStatus(boolean state, String msg) {
+        if (state){
+            this.status = "Successful";
+        }else {
+            this.status = "Not Successful";
+        }
+        setMessage(msg);
+    }
+
+    public String getMessage() {
+        return Message;
+    }
+
+    public void setMessage(String message) {
+        Message = message;
     }
 
     public String getStatus() {

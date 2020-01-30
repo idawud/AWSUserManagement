@@ -28,15 +28,19 @@ public class RolesController {
     @PostMapping(value = "/v1/api/aws-mgnt/send", consumes = "application/json", produces = "application/json")
     public PermissionStatus sendPermission(@RequestBody RolesRequest rolesRequest){
         try {
-            long insertId = permissionStorage.insert(rolesRequest.getEmail(), rolesRequest.getAwsArns());
+            long insertId = permissionStorage.insert(rolesRequest.getIdentifier(), rolesRequest.getEmail() ,rolesRequest.getAwsArns());
+            if ( insertId == -11){
+                return new PermissionStatus(false, "Operation halted, Submitting an empty request");
+            }
             String username = GSuite.fetchEmailToUserName().getOrDefault(rolesRequest.getEmail(), "");
             if (!username.isEmpty()){
-                EMail.requestMessage(username, rolesRequest.getEmail(), rolesRequest.getAwsArns(), rolesRequest.getExplanation(), String.valueOf(insertId));
+                EMail.requestMessage( rolesRequest.getIdentifier(), username, rolesRequest.getEmail(), rolesRequest.getAwsArns(), rolesRequest.getExplanation(), String.valueOf(insertId));
+                return new PermissionStatus(true, "request submitted, pending approval");
             }
-            return new PermissionStatus(true);
+            return new PermissionStatus(false, "Invalid User");
         }catch (Exception e){
             e.printStackTrace();
-            return new PermissionStatus(false);
+            return new PermissionStatus(false, "error sending mail");
         }
     }
 
@@ -45,19 +49,23 @@ public class RolesController {
     public PermissionStatus approve(  @PathVariable("requestId") long requestId ){
         try {
             Request requestDetails = permissionStorage.getRequestDetails(requestId);
+            if ( requestDetails  == null){
+                return new PermissionStatus(false, "permission Granted or Declined Already");
+            }
+
             permissionStorage.approvedRequest( requestId );
 
             String userEmail = requestDetails.getUserEmail();
             List<String> strings = Arrays.asList(requestDetails.getARN().split(" -,,- "));
             Set<String> awsArns = new HashSet<>(strings);
-           GSuite.grantMultipleAWSARN(userEmail, awsArns);
 
-           EMail.feedbackMessage(userEmail, true);
+           GSuite.grantMultipleAWSARN(userEmail, awsArns);
+           EMail.feedbackMessage(userEmail, requestDetails.getIdentifier(), true);
 
             return new PermissionStatus(true);
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();
-            return new PermissionStatus(false);
+            return new PermissionStatus(false,"error sending mail");
         }
     }
 
@@ -65,12 +73,17 @@ public class RolesController {
     @GetMapping(value = "/v1/api/aws-mgnt/decline/{requestId}", produces = "application/json")
     public PermissionStatus decline(  @PathVariable("requestId") long requestId ){
         try {
+            Request requestDetails = permissionStorage.getRequestDetails(requestId);
+            if ( requestDetails  == null){
+                return new PermissionStatus(false, "permission Granted or Declined Already");
+            }
+
             String email = permissionStorage.removeRequest(requestId);
-            EMail.feedbackMessage(email, false);
+            EMail.feedbackMessage(email, requestDetails.getIdentifier(),false);
             return new PermissionStatus(true);
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();
-            return new PermissionStatus(false);
+            return new PermissionStatus(false,"error sending email");
         }
     }
 

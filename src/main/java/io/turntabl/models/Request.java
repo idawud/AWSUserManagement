@@ -3,9 +3,22 @@ package io.turntabl.models;
 public class Request {
     private long id;
     private String userEmail;
+    private String request_time;
     private String status;
+    private String identifier;
     private String approvedTime;
     private String ARN;
+
+    public Request() {
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
     public long getId() {
         return id;
@@ -45,5 +58,13 @@ public class Request {
 
     public void setARN(String ARN) {
         this.ARN = ARN;
+    }
+
+    public String getRequest_time() {
+        return request_time;
+    }
+
+    public void setRequest_time(String request_time) {
+        this.request_time = request_time;
     }
 }
