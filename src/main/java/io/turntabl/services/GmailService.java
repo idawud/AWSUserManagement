@@ -85,7 +85,7 @@ public class GmailService {
 
         MimeMessage email = new MimeMessage(session);
 
-        email.setFrom(new InternetAddress(from));
+        email.setFrom(new InternetAddress("AWS Account Permission" + "<" + from + ">"));
         email.addRecipient(javax.mail.Message.RecipientType.TO,
                 new InternetAddress(to));
         email.setSubject(subject);

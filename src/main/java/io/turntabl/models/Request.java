@@ -4,8 +4,20 @@ public class Request {
     private long id;
     private String userEmail;
     private String status;
+    private String identifier;
     private String approvedTime;
     private String ARN;
+
+    public Request() {
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
     public long getId() {
         return id;
