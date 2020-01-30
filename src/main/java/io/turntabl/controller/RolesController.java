@@ -29,7 +29,7 @@ public class RolesController {
     public PermissionStatus sendPermission(@RequestBody RolesRequest rolesRequest){
         try {
             long insertId = permissionStorage.insert(rolesRequest.getIdentifier(), rolesRequest.getEmail() ,rolesRequest.getAwsArns());
-            if ( insertId == -1){
+            if ( insertId == -11){
                 return new PermissionStatus(false, "Operation halted, Submitting an empty request");
             }
             String username = GSuite.fetchEmailToUserName().getOrDefault(rolesRequest.getEmail(), "");

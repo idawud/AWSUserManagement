@@ -32,7 +32,7 @@ public class PermissionStorage {
             Number number = insert.executeAndReturnKey(insertValue);
             return number.longValue();
         }
-        return -1;
+        return -11;
     }
 
 
