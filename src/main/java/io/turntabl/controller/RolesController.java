@@ -29,14 +29,18 @@ public class RolesController {
     public PermissionStatus sendPermission(@RequestBody RolesRequest rolesRequest){
         try {
             long insertId = permissionStorage.insert(rolesRequest.getEmail(), rolesRequest.getAwsArns());
+            if ( insertId == -1){
+                return new PermissionStatus(false, "Operation halted, Submitting an empty request");
+            }
             String username = GSuite.fetchEmailToUserName().getOrDefault(rolesRequest.getEmail(), "");
             if (!username.isEmpty()){
                 EMail.requestMessage(username, rolesRequest.getEmail(), rolesRequest.getAwsArns(), rolesRequest.getExplanation(), String.valueOf(insertId));
+                return new PermissionStatus(true, "request submitted, pending approval");
             }
-            return new PermissionStatus(true);
+            return new PermissionStatus(false, "Invalid User");
         }catch (Exception e){
             e.printStackTrace();
-            return new PermissionStatus(false);
+            return new PermissionStatus(false, "error sending mail");
         }
     }
 
