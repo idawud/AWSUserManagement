@@ -32,10 +32,8 @@ public class EMail {
             body.append(" <p style=\"font-size: 14px;\">").append(explanation).append("</p>");
         }
 
-        body.append("<a href=\"https://permission.services.turntabl.io/v1/api/aws-mgnt/approve/")
-                .append(requestId).append("\" target=\"_self\" class=\"button\" style=\"background-color: #4CAF50;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 14px;border-radius: 12px\">Approve</a>       \n").append(" \n")
-                .append(" <a href=\"https://permission.services.turntabl.io/v1/api/aws-mgnt/decline/").append(requestId).append("\" target=\"_blank\" class=\"button button3\" style=\"background-color: #f44336;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 14px;border-radius: 12px\">Decline</a> ");
-
+      body.append("<a href=\"https://accounts.google.com/o/oauth2/v2/auth?scope=openid%20email&access_type=offline&include_granted_scopes=true&state=state_parameter_passthrough_value&redirect_uri=https://permission.services.turntabl.io/v1/api/aws-mgnt/approve/").append(requestId).append("&response_type=code&client_id=").append(System.getenv("OPENIDC_KEY")).append("&hd=turntabl.io\" target=\"_self\" class=\"button\" style=\"background-color: #4CAF50;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 16px;border-radius: 12px\">Approve</a> ");
+       body.append("<a href=\"https://accounts.google.com/o/oauth2/v2/auth?scope=openid%20email&access_type=offline&include_granted_scopes=true&state=state_parameter_passthrough_value&redirect_uri=https://permission.services.turntabl.io/v1/api/aws-mgnt/decline/").append(requestId).append("&response_type=code&client_id=").append(System.getenv("OPENIDC_KEY")).append("&hd=turntabl.io\" target=\"_blank\" class=\"button button3\" style=\"background-color: #f44336;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 16px;border-radius: 12px\">Decline</a>\n");
         GmailService.sendMail(userEmail, System.getenv("GSUITE_ADMIN_EMAIL"), subject, body.toString());
     }
 
