@@ -7,10 +7,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class EMail {
-    public static void requestMessage(String requestIdentifier, String userName, String userEmail , Set<String> roles,String explanation, String requestId) throws IOException, GeneralSecurityException {
+    public static void requestMessage(String userName, String userEmail , Set<String> roles, String requestId) throws IOException, GeneralSecurityException {
+        final String BACKEND_URL = System.getenv("SERVER_URL"); // https://services-1305239961.us-west-2.elb.amazonaws.com/permission/
         if ( roles.size() == 0){ return;}
 
-        String subject = "[" + requestIdentifier + "] Request for AWS Role Permission";
+        String subject = "Request for AWS Role Permission";
         StringBuilder body = new StringBuilder( " <p style=\"font-size: 14px;\">" + userName + " ( " + userEmail  + " ) <br>");
         if ( roles.size() > 1){
             body.append(" is seeking permission to the following AWS roles: </p>");
@@ -27,30 +28,24 @@ public class EMail {
             body.append(" is seeking permission for ").append(inter[inter.length - 1]).append("  AWS role. </p> <br>");
         }
 
-        if ( !explanation.isEmpty()){
-            body.append("<h4> Explanation: </h4>" );
-            body.append(" <p style=\"font-size: 14px;\">").append(explanation).append("</p>");
-        }
+        body.append("<a href=\"https://accounts.google.com/o/oauth2/v2/auth?scope=openid%20email&access_type=offline&include_granted_scopes=true&state=").append(requestId).append("&redirect_uri=").append(BACKEND_URL).append("approve/").append("&response_type=code&client_id=").append(System.getenv("OPENIDC_KEY")).append("&hd=turntabl.io\" target=\"_self\" class=\"button\" style=\"background-color: #4CAF50;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 16px;border-radius: 12px\">Approve</a> ");
+        body.append("<a href=\"https://accounts.google.com/o/oauth2/v2/auth?scope=openid%20email&access_type=offline&include_granted_scopes=true&state=").append(requestId).append("&redirect_uri=").append(BACKEND_URL).append("decline/").append("&response_type=code&client_id=").append(System.getenv("OPENIDC_KEY")).append("&hd=turntabl.io\" target=\"_blank\" class=\"button button3\" style=\"background-color: #f44336;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 16px;border-radius: 12px\">Decline</a>\n");
 
-        body.append("<a href=\"https://permission.services.turntabl.io/v1/api/aws-mgnt/approve/")
-                .append(requestId).append("\" target=\"_self\" class=\"button\" style=\"background-color: #4CAF50;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 14px;border-radius: 12px\">Approve</a>       \n").append(" \n")
-                .append(" <a href=\"https://permission.services.turntabl.io/v1/api/aws-mgnt/decline/").append(requestId).append("\" target=\"_blank\" class=\"button button3\" style=\"background-color: #f44336;border: none;color: white;padding: 10px 22px;text-align: center;text-decoration: none;display: inline-block;font-size: 14px;border-radius: 12px\">Decline</a> ");
-
-        GmailService.sendMail(userEmail, System.getenv("GSUITE_ADMIN_EMAIL"), subject, body.toString());
+        GmailService.sendMail(System.getenv("GSUITE_ADMIN_EMAIL"), userEmail, subject, body.toString());
     }
 
 
-    public static void feedbackMessage(String userEmail, String requestIdentifier, Boolean granted) throws IOException, GeneralSecurityException {
+    public static void feedbackMessage(String userEmail, Boolean granted) throws IOException, GeneralSecurityException {
         String subject, body;
         if (granted) {
-            subject = "[" + requestIdentifier + "] AWS Role Permission Request Granted";
+            subject = "AWS Role Permission Request Granted";
             body = " <p style=\"font-size: 16px;\"> This permissions will last for only "+ System.getenv("PERMISSION_DURATION_IN_MINUTES") + "min. </p>" ;
         }else {
             subject = "AWS Role Permission Request Declined";
             body = " <p style=\"font-size: 16px;\"> Sorry, your request has being declined, contact the administrator sam@turntabl.io</p>";
         }
 
-        GmailService.sendMail(System.getenv("GSUITE_ADMIN_EMAIL"), userEmail, subject, body);
+        GmailService.sendMail(userEmail, System.getenv("GSUITE_ADMIN_EMAIL"), subject, body);
     }
 
 }

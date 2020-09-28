@@ -30,8 +30,7 @@ public class GmailService {
     private static final List<String> SCOPES = ImmutableList.of(GmailScopes.GMAIL_SEND, GmailScopes.GMAIL_COMPOSE);
     private static final String CREDENTIALS_FILE_PATH = "credentials/google.json";
 
-
-    public static void sendMail(String from, String to, String subject, String bodyText) throws IOException, GeneralSecurityException {
+    public static void sendMail(String to, String from, String subject, String bodyText) throws IOException, GeneralSecurityException {
         Gmail service = getGmail();
         String user = "me";
         try {
@@ -49,7 +48,8 @@ public class GmailService {
         GoogleCredential gcFromJson = GoogleCredential
                 .fromStream(new FileInputStream(CREDENTIALS_FILE_PATH))
                 .createScoped(SCOPES);
-
+        System.out.println(gcFromJson.getServiceAccountId());
+        System.out.println(gcFromJson.getServiceAccountUser());
         GoogleCredential credential = new GoogleCredential.Builder()
                 .setTransport(gcFromJson.getTransport())
                 .setJsonFactory(gcFromJson.getJsonFactory())
@@ -59,6 +59,7 @@ public class GmailService {
                 .setServiceAccountScopes(gcFromJson.getServiceAccountScopes())
                 .setTokenServerEncodedUrl(gcFromJson.getTokenServerEncodedUrl())
                 .build();
+        ;
 
         return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
@@ -84,7 +85,6 @@ public class GmailService {
         Session session = Session.getDefaultInstance(props, null);
 
         MimeMessage email = new MimeMessage(session);
-
         email.setFrom(new InternetAddress("AWS Account Permission" + "<" + from + ">"));
         email.addRecipient(javax.mail.Message.RecipientType.TO,
                 new InternetAddress(to));

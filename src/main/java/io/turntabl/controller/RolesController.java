@@ -28,39 +28,37 @@ public class RolesController {
     @PostMapping(value = "/v1/api/aws-mgnt/send", consumes = "application/json", produces = "application/json")
     public PermissionStatus sendPermission(@RequestBody RolesRequest rolesRequest){
         try {
-            long insertId = permissionStorage.insert(rolesRequest.getIdentifier(), rolesRequest.getEmail() ,rolesRequest.getAwsArns());
-            if ( insertId == -11){
-                return new PermissionStatus(false, "Operation halted, Submitting an empty request");
-            }
+            long insertId = permissionStorage.insert(rolesRequest.getEmail(), rolesRequest.getAwsArns());
+            if ( insertId == -11){ return new PermissionStatus(false, "invalid request");}
             String username = GSuite.fetchEmailToUserName().getOrDefault(rolesRequest.getEmail(), "");
             if (!username.isEmpty()){
-                EMail.requestMessage( rolesRequest.getIdentifier(), username, rolesRequest.getEmail(), rolesRequest.getAwsArns(), rolesRequest.getExplanation(), String.valueOf(insertId));
-                return new PermissionStatus(true, "request submitted, pending approval");
+                EMail.requestMessage(username, rolesRequest.getEmail(), rolesRequest.getAwsArns() , String.valueOf(insertId));
             }
-            return new PermissionStatus(false, "Invalid User");
+            return new PermissionStatus(true);
         }catch (Exception e){
             e.printStackTrace();
-            return new PermissionStatus(false, "error sending mail");
+            return new PermissionStatus(false,"error sending mail");
         }
     }
 
     @ApiOperation("approve a request to gain permission to a set of services")
-    @GetMapping(value = "/v1/api/aws-mgnt/approve/{requestId}", produces = "application/json")
-    public PermissionStatus approve(  @PathVariable("requestId") long requestId ){
+    @GetMapping(value = "/v1/api/aws-mgnt/approve", produces = "application/json")
+    @ResponseBody
+    public PermissionStatus approve(   @RequestParam(name = "state") long state ){
         try {
-            Request requestDetails = permissionStorage.getRequestDetails(requestId);
+            Request requestDetails = permissionStorage.getRequestDetails(state);
             if ( requestDetails  == null){
                 return new PermissionStatus(false, "permission Granted or Declined Already");
             }
 
-            permissionStorage.approvedRequest( requestId );
+            permissionStorage.approvedRequest(state);
 
             String userEmail = requestDetails.getUserEmail();
             List<String> strings = Arrays.asList(requestDetails.getARN().split(" -,,- "));
             Set<String> awsArns = new HashSet<>(strings);
-
            GSuite.grantMultipleAWSARN(userEmail, awsArns);
-           EMail.feedbackMessage(userEmail, requestDetails.getIdentifier(), true);
+
+           EMail.feedbackMessage(userEmail, true);
 
             return new PermissionStatus(true);
         } catch (IOException | GeneralSecurityException e) {
@@ -70,20 +68,24 @@ public class RolesController {
     }
 
     @ApiOperation("decline a request to gain permission to a set of services")
-    @GetMapping(value = "/v1/api/aws-mgnt/decline/{requestId}", produces = "application/json")
-    public PermissionStatus decline(  @PathVariable("requestId") long requestId ){
+    @GetMapping(value = "/v1/api/aws-mgnt/decline", produces = "application/json")
+    @ResponseBody
+    public PermissionStatus decline(  @RequestParam(name = "state") long state ){
         try {
-            Request requestDetails = permissionStorage.getRequestDetails(requestId);
+            Request requestDetails = permissionStorage.getRequestDetails(state);
             if ( requestDetails  == null){
                 return new PermissionStatus(false, "permission Granted or Declined Already");
             }
 
-            String email = permissionStorage.removeRequest(requestId);
-            EMail.feedbackMessage(email, requestDetails.getIdentifier(),false);
+            String email = permissionStorage.removeRequest(state);
+            if ( email.equals("INVALID")) {
+                return new PermissionStatus(false, "permission Granted or Declined Already");
+            }
+            EMail.feedbackMessage(email, false);
             return new PermissionStatus(true);
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();
-            return new PermissionStatus(false,"error sending email");
+            return new PermissionStatus(false,"error sending mail");
         }
     }
 

@@ -149,11 +149,31 @@ public class GSuite {
                                 iam_role.add(permission.toMap());
                             }
                         });
+                        // update
+                        service.users().update(userId, user).execute();
+                    } else {
+                        List<Map<String, Object>> iamrole = new ArrayList<>();
+                        awsArns.forEach( arn -> iamrole.add((new Permission(arn).toMap())));
+                        o.put("IAM_Role", iamrole);
 
                         // update
                         service.users().update(userId, user).execute();
                     }
                 }
+            } else {
+                Map<String, Map<String, Object>> schemas = new Hashtable<>();
+                List<Map<String, Object>> iamrole = new ArrayList<>();
+
+                awsArns.forEach( arn -> iamrole.add((new Permission(arn).toMap())));
+
+                Map<String, Object> actual_role = new Hashtable<>();
+                actual_role.put("IAM_Role", iamrole);
+                schemas.put("AWS_SAML", actual_role);
+
+                user.setCustomSchemas(schemas);
+
+                // update
+                service.users().update(userId, user).execute();
             }
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();

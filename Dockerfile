@@ -1,4 +1,4 @@
-FROM adoptopenjdk:11-jre-hotspot
+FROM adoptopenjdk:8-jre-hotspot
 
 COPY build/libs/AWSAccountManagement-0.1.jar AWSAccountManagement.jar
 COPY src/main/resources/credentials credentials/aws
